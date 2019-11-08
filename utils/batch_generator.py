@@ -1,35 +1,18 @@
 import numpy as np
 
 
-#
-#
-# def batch_generator(dataframe, chunk_size):
-#     l = dataframe.shape[0]
-#     X, y = [], []
-#
-#     for ndx in range(0, l, chunk_size):
-#         X.append(dataframe.iloc[ndx:ndx + chunk_size, :-1])
-#         y.append(dataframe.iloc[ndx:ndx + chunk_size, -1:])
-#
-#     return X, y
+def batch_generator(dataframe, chunk_size, target=1):
+    X = dataframe[0: len(dataframe) - (len(dataframe) % chunk_size)]
+    X_batches = X.reshape(-1, chunk_size, 1)
 
+    Y = dataframe[1: len(dataframe) - (len(dataframe) % chunk_size) + target]
+    Y_batches = Y.reshape(-1, chunk_size, 1)
 
-def multivariate_data(dataset, target, start_index, end_index, history_size,
-                      target_size, step, single_step=False):
-    data = []
-    labels = []
+    X_test = dataframe[-(chunk_size + target):]
+    X_test = X_test[:chunk_size]
+    X_test = X_test.reshape(-1, chunk_size, 1)
 
-    start_index = start_index + history_size
-    if end_index is None:
-        end_index = len(dataset) - target_size
+    y_test = dataframe[-chunk_size:]
+    y_test = y_test.reshape(-1, chunk_size, 1)
 
-    for i in range(start_index, end_index):
-        indices = range(i - history_size, i, step)
-        data.append(dataset[indices])
-
-        if single_step:
-            labels.append(target[i + target_size])
-        else:
-            labels.append(target[i:i + target_size])
-
-    return np.array(data), np.array(labels)
+    return X_batches, Y_batches, X_test, y_test
