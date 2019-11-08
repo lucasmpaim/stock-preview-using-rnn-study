@@ -105,10 +105,10 @@ plt.plot(range(0, past_history), y_test2, 'x', label='real')
 plt.legend()
 plt.show()
 
-loss, acc = model.evaluate(X_test,  y_test, verbose=2)
-print("Untrained model, accuracy: {:5.2f}%".format(100*acc))
+# loss, acc = model.evaluate(X_test,  y_test, verbose=2)
+# print("Untrained model, accuracy: {:5.2f}%".format(100*acc))
 
-
+# differential_evolution_minimize
 model.save_weights('models/deep_weights.rnn')
 
 # EVALUATION_INTERVAL = 7 * 3
