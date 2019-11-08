@@ -76,11 +76,18 @@ model.add(
 model.add(
     Dropout(0.2)
 )
+model.add(
+    LSTM(hidden_layer_size, activation=tf.nn.relu,
+         return_sequences=True,
+         input_shape=(X_train.shape[1], X_train.shape[2])),
+)
+model.add(
+    Dropout(0.2)
+)
 model.add(Dense(1))
 model.compile(loss='mae', optimizer='adam')
 
-EVALUATION_INTERVAL = 7 * 2
-EPOCHS = 10
+EPOCHS = 300
 
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
@@ -93,12 +100,18 @@ predicted = model.predict(X_test)
 predicted2 = np.ravel(predicted)
 y_test2 = np.ravel(y_test)
 
-plt.plot(predicted2, 'r', 'o', label='predict')
-plt.plot(y_test2, 'g', 'x', label='real')
-# plt.plot(y_test[0], 'g', 'x')
+plt.plot(range(0, past_history), predicted2, '*', label='predict')
+plt.plot(range(0, past_history), y_test2, 'x', label='real')
 plt.legend()
 plt.show()
 
+loss, acc = model.evaluate(X_test,  y_test, verbose=2)
+print("Untrained model, accuracy: {:5.2f}%".format(100*acc))
+
+
+model.save_weights('models/deep_weights.rnn')
+
+# EVALUATION_INTERVAL = 7 * 3
 # single_step_history = model.fit(X_train,
 #                                 epochs=EPOCHS,
 #                                 steps_per_epoch=EVALUATION_INTERVAL,
