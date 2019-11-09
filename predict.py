@@ -102,7 +102,7 @@ y_val2 = [undo_normalize(y, petr4_frame['Close']) for y in np.ravel(y_val)]
 
 plt.plot(range(0, past_history), [undo_normalize(x, petr4_frame['Close']) for x in X_val[0]], label='history')
 plt.plot(range(len(X_val[0]), len(X_val[0]) + past_history), predicted2, '*', label='predict')
-plt.plot(range(len(X_val[0]), len(X_val[0]) + past_history), y_val2, 'x', label='real')
+plt.plot(range(len(X_val[0]), len(X_val[0]) + past_history), y_val2, 'o', label='real', alpha=0.5)
 plt.legend()
 plt.show()
 
