@@ -191,7 +191,7 @@
 
 % resumo em português
 \begin{resumoumacoluna}
- Este trabalho tem por objetivo criar uma rede neural de aprendizagem profunda para prever valores futuros de um papel na bolsa de valores, o papel escolhido foi PETR4 (Petrobras). A biblioteca utilizada para a criação das hipóteses foi a tensorflow, que segundo \citeonline{handsOnML}, é uma ótima biblioteca para cálculo número de código aberto,  (adicionar resultados)
+ Este trabalho tem por objetivo criar uma rede neural de aprendizagem profunda para prever valores futuros de um papel na bolsa de valores, o papel escolhido foi PETR4 (Petrobras). A biblioteca utilizada para a criação das hipóteses foi a tensorflow, que segundo \citeonline{handsOnML}, é uma ótima biblioteca para cálculo número de código aberto, o modelo atingiu um erro médio de apenas R\$0,68, que apesar de ser baixo o mercado de ações é extremamente volátil, sendo necessário adicionar N outras características ao treinamento, sendo assim, não podendo ser utilizado em produção.
  \vspace{\onelineskip}
  
  \noindent
@@ -203,7 +203,7 @@
 \renewcommand{\resumoname}{Abstract}
 \begin{resumoumacoluna}
  \begin{otherlanguage*}{english}
-This work aims to create a deep learning neural network to predict future values of a role in the stock exchange, the role chosen was PETR4 (Petrobras). The library used for hypothesis creation was tensorflow, which according to \citeonline{handsOnML}, is a great open source number library
+This work aims to create a deep learning neural network to predict future values of a role in the stock exchange, the role chosen was PETR4 (Petrobras). The library used for hypothesis creation was tensorflow, which according to \citeonline{handsOnML}, is a great open source number library. The model reached an average error of only R\$ 0.68, which despite being low the stock market is extremely volatile, being necessary to add N other characteristics to the training, so it cannot be used in production.
 
    \vspace{\onelineskip}
  
@@ -238,7 +238,7 @@ Utilizando a bibiloteca tensorflow (v. 2.0.0), foi montada uma rede neural recor
 
 Em um primeiro momento, a base foi dividida em teste e validação em que os últimos 6 valores da base foram separados em: 5 para dados e 1 previsão e o resto da base é utilizada para treinamento, em que também é dividida na proporção 5:1 e treinada durante 100 épocas, estas configurações foram escolhidas empiricamente , para a escolha desses hiperparâmetros, uma abordagem melhor seria com o uso de algoritmos de busca como os algoritmos genéticos.
 
-O gráfico de loss durante o treinamento, comparando a base de validação e a de treinamento pode ser visualizada na \autoref{loss-graph}, nele podemos notar que não houve overitting na rede, as camadas "Dropout" que aparecem na \autoref{model-image} que segundo \citeonline{dropout} definindo aleatoriamente as arestas de saída das neurônios ocultos como 0.
+O gráfico de loss durante o treinamento, comparando a base de validação e a de treinamento pode ser visualizada na \autoref{loss-graph}, nele podemos notar que não houve overitting na rede, as camadas "Dropout" que aparecem na \autoref{model-image} que segundo \citeonline{dropout} definindo aleatoriamente as arestas de saída das neurônios ocultos como 0, é possível ver graficamente a ação desta célula na \autoref{dropout}.
 
 As células LSTM, proposta em 1997 por Sepp Hochreiter e Jurgen Schmidhuber e aperfeiçoada desde então, que segundo \citeonline{handsOnML}, sua ideia-chave é que a rede possa aprender o que armazenar a longo prazo durante o treinamento.
 
@@ -252,7 +252,40 @@ mae = \frac{1}{n}\sum_{i=0}^M |{y_1 - y^*_i}|
 
 O modelo atingiu um erro médio de R\$0,68, que é um erro médio aceitável para este trabalho.
 
-O grafico de previsões pode ser visualizado na \autoref{results-chart}
+O grafico de previsões pode ser visualizado na \autoref{results-chart}, os valores estão detalhados na tabela a seguir:
+
+\begin{verbatim}
+Predict  True  Error
+	-------  -----  ---------
+	27.0385  27.06  0.0215228
+	27.2117  26.88  0.331698
+	27.3673  28.06  0.692717
+	28.3972  27.69  0.707238
+	28.3212  27.22  1.10122
+	28.0565  27.29  0.76648
+	28.0641  27     1.06411
+	27.818   27.48  0.337986
+	28.1443  27.27  0.874328
+	28.0211  27.34  0.681134
+	28.0867  27.7   0.386704
+	28.3649  27.66  0.704869
+	28.3885  27.55  0.838499
+	28.3401  27.51  0.830096
+	28.3062  26.72  1.5862
+	27.7085  26.74  0.968548
+	27.6006  26.51  1.09064
+	27.339   26.17  1.16899
+	27.0153  26.02  0.995316
+	26.8138  26.52  0.293842
+	27.13    26.74  0.390012
+	27.3374  27.26  0.0774144
+	27.8091  27.31  0.499109
+	27.953   27.6   0.353045
+	28.2499  27.93  0.319885
+	-------  -----  ---------
+\end{verbatim}
+
+Mesmo a rede tendo resultados satisfatórios, é necessário se considerar que o mercado de ações é extremamente volátil e que não segue um padrão em si, sendo facilmente influenciado por fatos políticos, econômicos etc. que não necessariamente faça com que a ação tenda a seguir um padrão.
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
 % ----------------------------------------------------------
@@ -311,8 +344,6 @@ O grafico de previsões pode ser visualizado na \autoref{results-chart}
 	\legend{Fonte: O Autor}
 \end{figure}
 
-
-
 \begin{figure}[htb]
 	\caption{\label{results-chart}Loss}
 	\begin{center}
@@ -320,6 +351,16 @@ O grafico de previsões pode ser visualizado na \autoref{results-chart}
 	\end{center}
 	\legend{Fonte: O Autor}
 \end{figure}
+
+
+\begin{figure}[htb]
+	\caption{\label{dropout}Loss}
+	\begin{center}
+		\includegraphics[scale=0.3]{images/with_without_dropout.png}
+	\end{center}
+	\legend{Fonte: \citeonline{dropout}}
+\end{figure}
+
 
 \end{anexosenv}
 
