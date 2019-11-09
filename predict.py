@@ -100,24 +100,22 @@ predicted = model.predict(X_val)
 predicted2 = [undo_normalize(y, petr4_frame['Close']) for y in np.ravel(predicted)]
 y_val2 = [undo_normalize(y, petr4_frame['Close']) for y in np.ravel(y_val)]
 
-plt.plot(range(0, past_history), predicted2, '*', label='predict')
-plt.plot(range(0, past_history), y_val2, 'x', label='real')
+plt.plot(range(0, past_history), [undo_normalize(x, petr4_frame['Close']) for x in X_val[0]], label='history')
+plt.plot(range(len(X_val[0]), len(X_val[0]) + past_history), predicted2, '*', label='predict')
+plt.plot(range(len(X_val[0]), len(X_val[0]) + past_history), y_val2, 'x', label='real')
 plt.legend()
 plt.show()
 
 print(model.evaluate(X_val, y_val, verbose=2))
 
-table = [
-    np.ravel(["Predict", [undo_normalize(y, petr4_frame['Close']) for y in predicted]]),
-    np.ravel(["True", [undo_normalize(y, petr4_frame['Close']) for y in y_val2]]),
-    np.ravel(["Error", [
-        abs(undo_normalize(predicted, petr4_frame['Close']) - undo_normalize(true, petr4_frame['Close']))
-        for predicted, true in zip(predicted2, y_val2)]])
-]
+
+table = []
+for predicted, true in zip(predicted2, y_val2):
+    table.append([str(predicted), str(true), str(abs(predicted - true))])
 print(tabulate(table))
 
 global_mse = sum(
-    [undo_normalize(predicted, petr4_frame['Close']) - undo_normalize(true, petr4_frame['Close'])
+    [abs(predicted - true)
      for predicted, true in zip(predicted2, y_val2)]
 ) / len(predicted2)
 

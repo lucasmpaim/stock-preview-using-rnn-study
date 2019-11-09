@@ -100,14 +100,14 @@ model.add(
 model.add(Dense(1))
 model.compile(loss='mae', optimizer='adam')
 
-EPOCHS = 10
+EPOCHS = 100
 
-log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S-ADAM")
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 model.fit(X_train, y_train, epochs=EPOCHS,
           steps_per_epoch=125,
-          validation_steps=5,
+          validation_steps=25,
           validation_data=tensor_dataset_slice_val,
           callbacks=[tensorboard_callback])
 
