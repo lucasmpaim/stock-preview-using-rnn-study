@@ -93,14 +93,11 @@
 % ---
 
 % --- Informações de dados para CAPA e FOLHA DE ROSTO ---
-\titulo{Previsão de cotacão de ações da bolsa de valores usando séries temporais e Redes Neurovolucionais}
-\tituloestrangeiro{Stock Market Forecasting Using Time Series and Neurovolutional Networks}
+\titulo{Previsão de cotação de ações da bolsa de valores usando redes neurais recorrentes - RNN}
+\tituloestrangeiro{Stock Market Forecasting Using Recurrent Neural Networks - RNN}
 
 \autor{
 	Lucas Mrowskovsy Paim\thanks{Programa de Pós Graduação em Inteligência Aritificial, Curitiba - PR, 80215-901; Especializando em Inteligência Artificial Aplicada na PUCPR; Tecnólogo em Sistemas para Internet pela Universidade Positivo; E-mail: lucasmpaim1@gmail.com} 
-\\[0.5cm] \left( 
-Juliana Soldera\thanks{``Constar currículo sucinto de cada autor, com 
-	vinculação corporativa e endereço de contato.''} 
 }
 
 \local{Brasil}
@@ -194,11 +191,11 @@ Juliana Soldera\thanks{``Constar currículo sucinto de cada autor, com
 
 % resumo em português
 \begin{resumoumacoluna}
- Este trabalho tem por objetivo criar uma rede neural de aprendizagem profunda para prever valores futuros de um papel na bolsa de valores, o papel escolhido foi PETR4 (Petrobras), nele é comparado duas abordagens para a minimização de erro, a descida do gradiente e a neuroevolução, que é baseada em algoritmos genéticos, para o treinamento da rede. A biblioteca utilizada para a criação das hipóteses foi a tensorflow, que segundo \citeonline{handsOnML}, é uma ótima biblioteca para cálculo número de código aberto,  (adicionar resultados)
+ Este trabalho tem por objetivo criar uma rede neural de aprendizagem profunda para prever valores futuros de um papel na bolsa de valores, o papel escolhido foi PETR4 (Petrobras). A biblioteca utilizada para a criação das hipóteses foi a tensorflow, que segundo \citeonline{handsOnML}, é uma ótima biblioteca para cálculo número de código aberto,  (adicionar resultados)
  \vspace{\onelineskip}
  
  \noindent
- \textbf{Palavras-chave}: deep-learning. tensorflow. redes neurovolucionais. séries temporais.
+ \textbf{Palavras-chave}: deep-learning. tensorflow. rnn. séries temporais.
 \end{resumoumacoluna}
 
 
@@ -206,12 +203,12 @@ Juliana Soldera\thanks{``Constar currículo sucinto de cada autor, com
 \renewcommand{\resumoname}{Abstract}
 \begin{resumoumacoluna}
  \begin{otherlanguage*}{english}
-   According to ABNT NBR 6022:2018, an abstract in foreign language is optional.
+This work aims to create a deep learning neural network to predict future values of a role in the stock exchange, the role chosen was PETR4 (Petrobras). The library used for hypothesis creation was tensorflow, which according to \citeonline{handsOnML}, is a great open source number library
 
    \vspace{\onelineskip}
  
    \noindent
-   \textbf{Keywords}: latex. abntex.
+   \textbf{Keywords}:deep-learning. tensorflow. rnn. temporal series.
  \end{otherlanguage*}  
 \end{resumoumacoluna}
 
@@ -228,193 +225,30 @@ Juliana Soldera\thanks{``Constar currículo sucinto de cada autor, com
 % ----------------------------------------------------------
 \section{Introdução}
 
-Este documento e seu código-fonte são exemplos de referência de uso da classe
-\textsf{abntex2} e do pacote \textsf{abntex2cite}. O documento exemplifica a
-elaboração de publicação periódica científica impressa produzida conforme a ABNT
-NBR 6022:2018 \emph{Informação e documentação - Artigo em publicação periódica
-científica - Apresentação}.
-
-A expressão ``Modelo canônico'' é utilizada para indicar que \abnTeX\ não é
-modelo específico de nenhuma universidade ou instituição, mas que implementa tão
-somente os requisitos das normas da ABNT. Uma lista completa das normas
-observadas pelo \abnTeX\ é apresentada em \citeonline{abntex2classe}.
-
-Sinta-se convidado a participar do projeto \abnTeX! Acesse o site do projeto em
-\url{http://www.abntex.net.br/}. Também fique livre para conhecer,
-estudar, alterar e redistribuir o trabalho do \abnTeX, desde que os arquivos
-modificados tenham seus nomes alterados e que os créditos sejam dados aos
-autores originais, nos termos da ``The \LaTeX\ Project Public
-License''\footnote{\url{http://www.latex-project.org/lppl.txt}}.
-
-Encorajamos que sejam realizadas customizações específicas deste documento.
-Porém, recomendamos que ao invés de se alterar diretamente os arquivos do
-\abnTeX, distribua-se arquivos com as respectivas customizações. Isso permite
-que futuras versões do \abnTeX~não se tornem automaticamente incompatíveis com
-as customizações promovidas. Consulte \citeonline{abntex2-wiki-como-customizar}
-para mais informações.
-
-Este exemplo deve ser utilizado como complemento do manual da classe
-\textsf{abntex2} \cite{abntex2classe}, dos manuais do pacote
-\textsf{abntex2cite} \cite{abntex2cite,abntex2cite-alf} e do manual da classe
-\textsf{memoir} \cite{memoir}. Consulte o \citeonline{abntex2modelo} para obter
-exemplos e informações adicionais de uso de \abnTeX\ e de \LaTeX.
+Segundo \citeonline{time-series-analysis-2009}, uma série temporal é uma coleção de observações ao longo do tempo, isto é, são dados que variam de acordo com o passar do tempo, como: comportamentos cerebrais \citeonline{NIPS2014_5624}, identificação de ritmos musicais, auxílio na composições musicais \citeonline{sbcm-2007-26}, taxa mensal de desemprego, eletrocardiograma, etc. As redes neurais recorrentes tentam identificar estes padrões fazendo conexões com neurônios anteriores. Este trabalho irá utilizar redes neurais com aprendizagem profunda, para tentar prever os valores futuros das cotações do papel PETR4 (Petrobrás), usando dados extraídos do Google Finance, com dados a partir de 2006.
 
 % ----------------------------------------------------------
 % Seção de explicações
 % ----------------------------------------------------------
-\section{Exemplos de comandos}
+\section{Método}
 
-\subsection{Margens}
+A base utilizada para este trabalho, foram os dados históricos das ações da Petrobrás (PETR4) extraídos a partir do google finance, para o período de 05/09/2006 até 07/11/2019, estes dados podem ser visualizados na \autoref{petr4-chart}.
 
-A norma ABNT NBR 6022:2018 não estabelece uma margem específica a ser utilizada
-no artigo científico. Dessa maneira, caso deseje alterar as margens, utilize os
-comandos abaixo:
+Utilizando a bibiloteca tensorflow (v. 2.0.0), foi montada uma rede neural recorrente (RNN), utilizando duas camadas de neurônios de memória LSTM (Long Short Term Memory), o modelo gerado pode ser consultado na imagem: \autoref{model-image}
 
-\begin{verbatim}
-   \setlrmarginsandblock{3cm}{3cm}{*}
-   \setulmarginsandblock{3cm}{3cm}{*}
-   \checkandfixthelayout
-\end{verbatim}
+Em um primeiro momento, a base foi dividida em teste e validação em que os últimos 6 valores da base foram separados em: 5 para dados e 1 previsão e o resto da base é utilizada para treinamento, em que também é dividida na proporção 5:1 e treinada durante 100 épocas, estas configurações foram escolhidas empiricamente , para a escolha desses hiperparâmetros, uma abordagem melhor seria com o uso de algoritmos de busca como os algoritmos genéticos.
 
-\subsection{Duas colunas}
+O gráfico de loss durante o treinamento, comparando a base de validação e a de treinamento pode ser visualizada na \autoref{loss-graph}, nele podemos notar que não houve overitting na rede, as camadas "Dropout" que aparecem na \autoref{model-image} que segundo \citeonline{dropout} definindo aleatoriamente as arestas de saída das neurônios ocultos como 0.
 
-É comum que artigos científicos sejam escritos em duas colunas. Para isso,
-adicione a opção \texttt{twocolumn} à classe do documento, como no exemplo:
+As células LSTM, proposta em 1997 por Sepp Hochreiter e Jurgen Schmidhuber e aperfeiçoada desde então, que segundo \citeonline{handsOnML}, sua ideia-chave é que a rede possa aprender o que armazenar a longo prazo durante o treinamento.
 
-\begin{verbatim}
-   \documentclass[article,11pt,oneside,a4paper,twocolumn]{abntex2}
-\end{verbatim}
+Para a avialiação do erro foi utilizado a métrica MAE (Mean Absoluty Error), que é a média aritmética da diferença entre o valor previsto e o valor real, ela pode ser representada pela fórmula:
 
-É possível indicar pontos do texto que se deseja manter em apenas uma coluna,
-geralmente o título e os resumos. Os resumos em única coluna em documentos com
-a opção \texttt{twocolumn} devem ser escritos no ambiente
-\texttt{resumoumacoluna}:
+\begin{equation}
+mae = \frac{1}{n}\sum_{i=0}^M |{y_1 - y^*_i}|
+\end{equation}
 
-\begin{verbatim}
-   \twocolumn[              % INICIO DE ARTIGO EM DUAS COLUNAS
-
-     \maketitle             % pagina de titulo
-
-     \renewcommand{\resumoname}{Nome do resumo}
-     \begin{resumoumacoluna}
-        Texto do resumo.
-      
-        \vspace{\onelineskip}
- 
-        \noindent
-        \textbf{Palavras-chave}: latex. abntex. editoração de texto.
-     \end{resumoumacoluna}
-   
-   ]                        % FIM DE ARTIGO EM DUAS COLUNAS
-\end{verbatim}
-
-\subsection{Recuo do ambiente \texttt{citacao}}
-
-Na produção de artigos (opção \texttt{article}), pode ser útil alterar o recuo
-do ambiente \texttt{citacao}. Nesse caso, utilize o comando:
-
-\begin{verbatim}
-   \setlength{\ABNTEXcitacaorecuo}{1.8cm}
-\end{verbatim}
-
-Quando um documento é produzido com a opção \texttt{twocolumn}, a classe
-\textsf{abntex2} automaticamente altera o recuo padrão de 4 cm, definido pela
-ABNT NBR 10520:2002 seção 5.3, para 1.8 cm.
-
-\section{Cabeçalhos e rodapés customizados}
-
-Diferentes estilos de cabeçalhos e rodapés podem ser criados usando os
-recursos padrões do \textsf{memoir}.
-
-Um estilo próprio de cabeçalhos e rodapés pode ser diferente para páginas pares
-e ímpares. Observe que a diferenciação entre páginas pares e ímpares só é
-utilizada se a opção \texttt{twoside} da classe \textsf{abntex2} for utilizado.
-Caso contrário, apenas o cabeçalho padrão da página par (\emph{even}) é usado.
-
-Veja o exemplo abaixo cria um estilo chamado \texttt{meuestilo}. O código deve
-ser inserido no preâmbulo do documento.
-
-\begin{verbatim}
-%%criar um novo estilo de cabeçalhos e rodapés
-\makepagestyle{meuestilo}
-  %%cabeçalhos
-  \makeevenhead{meuestilo} %%pagina par
-     {topo par à esquerda}
-     {centro \thepage}
-     {direita}
-  \makeoddhead{meuestilo} %%pagina ímpar ou com oneside
-     {topo ímpar/oneside à esquerda}
-     {centro\thepage}
-     {direita}
-  \makeheadrule{meuestilo}{\textwidth}{\normalrulethickness} %linha
-  %% rodapé
-  \makeevenfoot{meuestilo}
-     {rodapé par à esquerda} %%pagina par
-     {centro \thepage}
-     {direita} 
-  \makeoddfoot{meuestilo} %%pagina ímpar ou com oneside
-     {rodapé ímpar/onside à esquerda}
-     {centro \thepage}
-     {direita}
-\end{verbatim}
-
-Para usar o estilo criado, use o comando abaixo imediatamente após um dos
-comandos de divisão do documento. Por exemplo:
-
-\begin{verbatim}
-   \begin{document}
-     %%usar o estilo criado na primeira página do artigo:
-     \pretextual
-     \pagestyle{meuestilo}
-     
-     \maketitle
-     ...
-     
-     %%usar o estilo criado nas páginas textuais
-     \textual
-     \pagestyle{meuestilo}
-     
-     \chapter{Novo capítulo}
-     ...
-   \end{document}  
-\end{verbatim}
-   
-Outras informações sobre cabeçalhos e rodapés estão disponíveis na seção 7.3 do
-manual do \textsf{memoir} \cite{memoir}.
-
-\section{Mais exemplos no Modelo Canônico de Trabalhos Acadêmicos}
-
-Este modelo de artigo é limitado em número de exemplos de comandos, pois são
-apresentados exclusivamente comandos diretamente relacionados com a produção de
-artigos.
-
-Para exemplos adicionais de \abnTeX\ e \LaTeX, como inclusão de figuras,
-fórmulas matemáticas, citações, e outros, consulte o documento
-\citeonline{abntex2modelo}.
-
-\section{Consulte o manual da classe \textsf{abntex2}}
-
-Consulte o manual da classe \textsf{abntex2} \cite{abntex2classe} para uma
-referência completa das macros e ambientes disponíveis.
-
-% ---
-% Finaliza a parte no bookmark do PDF, para que se inicie o bookmark na raiz
-% ---
-\bookmarksetup{startatroot}% 
-% ---
-
-% ---
-% Conclusão
-% ---
-\section{Considerações finais}
-
-\lipsum[1]
-
-\begin{citacao}
-\lipsum[2]
-\end{citacao}
-
-\lipsum[3]
+O modelo atingiu uma MSE de 
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
@@ -439,19 +273,6 @@ referência completa das macros e ambientes disponíveis.
 % Apêndices
 % ----------------------------------------------------------
 
-% ---
-% Inicia os apêndices
-% ---
-\begin{apendicesenv}
-
-% ----------------------------------------------------------
-\chapter{Nullam elementum urna vel imperdiet sodales elit ipsum pharetra ligula
-ac pretium ante justo a nulla curabitur tristique arcu eu metus}
-% ----------------------------------------------------------
-\lipsum[55-56]
-
-\end{apendicesenv}
-% ---
 
 % ----------------------------------------------------------
 % Anexos
@@ -463,21 +284,32 @@ ac pretium ante justo a nulla curabitur tristique arcu eu metus}
 %\anexos
 \begin{anexosenv}
 
-% ---
-\chapter{Cras non urna sed feugiat cum sociis natoque penatibus et magnis dis
-parturient montes nascetur ridiculus mus}
-% ---
+\begin{figure}[htb]
+	\caption{\label{petr4-chart}Gráfico histórico PETR4 R\$ x Dias úteis após 05/09/2006}
+	\begin{center}
+		\includegraphics[scale=0.5]{images/petr4_chart.png}
+	\end{center}
+	\legend{Fonte: O Autor}
+\end{figure}
 
-\lipsum[31]
+\begin{figure}[htb]
+	\caption{\label{model-image}Modelo}
+	\begin{center}
+		\includegraphics[scale=0.5]{images/model.png}
+	\end{center}
+	\legend{Fonte: O Autor}
+\end{figure}
+
+\begin{figure}[htb]
+	\caption{\label{loss-graph}Loss}
+	\begin{center}
+		\includegraphics[scale=0.5]{images/loss.png}
+	\end{center}
+	\legend{Fonte: O Autor}
+\end{figure}
+
 
 \end{anexosenv}
 
-% ----------------------------------------------------------
-% Agradecimentos
-% ----------------------------------------------------------
-
-\section*{Agradecimentos}
-Texto sucinto aprovado pelo periódico em que será publicado. Último 
-elemento pós-textual.
 
 \end{document}

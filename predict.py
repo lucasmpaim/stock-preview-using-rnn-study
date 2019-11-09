@@ -4,26 +4,20 @@ import tensorflow as tf
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from tabulate import tabulate
 from tensorflow_core.python.keras.layers.core import Dense, Dropout
 from tensorflow_core.python.keras.layers.recurrent import LSTM
 from tensorflow_core.python.keras.utils.vis_utils import plot_model
 
 from utils.split_dataset import split_dataset
-from utils.data_frame_utils import rename_frame, normalize
+from utils.data_frame_utils import rename_frame, undo_normalize, normalize
 
 data_frame = pd.read_csv('data/stocks.csv')
 
-ibov_frame = data_frame.iloc[1:, 0:2]
-rename_frame(ibov_frame)
-ibov_frame['Close'] = normalize(ibov_frame['Close'])
-
 petr4_frame = data_frame.iloc[1:, 3:5]
 rename_frame(petr4_frame)
-petr4_frame['Close'] = normalize(petr4_frame['Close'])
-
-dolar_frame = data_frame.iloc[1:, 9:11]
-rename_frame(dolar_frame)
-dolar_frame['Close'] = normalize(dolar_frame['Close'])
+normalized = petr4_frame.copy()
+normalized['Close'] = normalize(normalized['Close'])
 
 TRAIN_SPLIT = 3000
 
@@ -52,7 +46,7 @@ np.random.seed(22)
 features = pd.DataFrame()
 # features['Ibov'] = ibov_frame['Close'].to_numpy()
 # features['Dolar'] = dolar_frame['Close'].to_numpy()
-features['Petr4'] = petr4_frame['Close'].to_numpy()
+features['Petr4'] = normalized['Close'].to_numpy()
 
 print(features.head())
 print(features.shape)
@@ -73,7 +67,7 @@ batch_size = 5
 
 tensor_dataset_slice_train = tf.data.Dataset.from_tensor_slices((X_train, y_train))
 tensor_dataset_slice_train = tensor_dataset_slice_train.cache() \
-    .batch(batch_size).repeat()
+    .shuffle(batch_size).batch(batch_size).repeat()
 
 tensor_dataset_slice_val = tf.data.Dataset.from_tensor_slices((X_val, y_val))
 tensor_dataset_slice_val = tensor_dataset_slice_val.cache() \
@@ -100,25 +94,35 @@ model.add(
 model.add(Dense(1))
 model.compile(loss='mae', optimizer='adam')
 
-EPOCHS = 10
+model.load_weights('models/deep_weights.rnn')
 
-log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S-ADAM")
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+predicted = model.predict(X_val)
+predicted2 = [undo_normalize(y, petr4_frame['Close']) for y in np.ravel(predicted)]
+y_val2 = [undo_normalize(y, petr4_frame['Close']) for y in np.ravel(y_val)]
 
-model.fit(X_train, y_train, epochs=EPOCHS,
-          steps_per_epoch=125,
-          validation_steps=5,
-          validation_data=tensor_dataset_slice_val,
-          callbacks=[tensorboard_callback])
+plt.plot(range(0, past_history), predicted2, '*', label='predict')
+plt.plot(range(0, past_history), y_val2, 'x', label='real')
+plt.legend()
+plt.show()
 
-# predicted = model.predict(X_val)
-# predicted2 = np.ravel(predicted)
-# y_test2 = np.ravel(y_test)
+print(model.evaluate(X_val, y_val, verbose=2))
 
-# plt.plot(range(0, past_history), predicted2, '*', label='predict')
-# plt.plot(range(0, past_history), y_test2, 'x', label='real')
-# plt.legend()
-# plt.show()
+table = [
+    np.ravel(["Predict", [undo_normalize(y, petr4_frame['Close']) for y in predicted]]),
+    np.ravel(["True", [undo_normalize(y, petr4_frame['Close']) for y in y_val2]]),
+    np.ravel(["Error", [
+        abs(undo_normalize(predicted, petr4_frame['Close']) - undo_normalize(true, petr4_frame['Close']))
+        for predicted, true in zip(predicted2, y_val2)]])
+]
+print(tabulate(table))
 
-# differential_evolution_minimize
-model.save_weights('models/deep_weights.rnn')
+global_mse = sum(
+    [undo_normalize(predicted, petr4_frame['Close']) - undo_normalize(true, petr4_frame['Close'])
+     for predicted, true in zip(predicted2, y_val2)]
+) / len(predicted2)
+
+print(f'Global MSE: {global_mse}')
+
+predict_next_day_X = np.array(features[-25:]).reshape(-1, 25, 1)
+result = model.predict(predict_next_day_X)[0]
+print(f'Próximo valor: {undo_normalize(result, petr4_frame["Close"])}')

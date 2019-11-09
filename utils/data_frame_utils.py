@@ -6,9 +6,11 @@ def rename_frame(df):
                        df.columns[1]: 'Close'},
               inplace=True)
     df['Close'] = df['Close'].astype(np.float)
-    df['Close'] = normalize(df['Close'])
 
 
 def normalize(serie):
-    return (serie - serie.mean()) / np.abs(serie.max())
+    return serie / np.abs(serie.max())
 
+
+def undo_normalize(value, serie):
+    return value * np.abs(serie.max())
